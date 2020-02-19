@@ -5,7 +5,6 @@ import os
 import time
 import subprocess
 import sys
-import numpy as np
 import time
 
 of = False
