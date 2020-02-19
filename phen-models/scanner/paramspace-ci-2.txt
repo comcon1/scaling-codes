@@ -1,0 +1,13 @@
+# another parametric space for Contraction-Induction scan
+# copy this into mkparamset-ci.py instead of header
+
+dm = [1,5,10]
+de = [10,20,30]
+am1 = [1e-5,1e-4,1e-3,1e-2,.1,1]
+am2 = [1e-3,1e-2,1e-1,1,10,1e2]
+ae = [1e-5,1e-4,1e-3,1e-2]
+flx = [.1,1,10]
+be = [1e-2,1e-1,1.0]
+t0 = [1e-5,1e-4,1e-3]
+h = [2,4]
+L = [50,100]
