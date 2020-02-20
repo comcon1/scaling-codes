@@ -1,4 +1,4 @@
-NUM_CORES=4
+NCORES=4
 
 all: 
 	@echo 'This makefile runs scanning procedure.'
@@ -9,7 +9,7 @@ scan: logoptim.log
 	true
 
 logoptim.log: _current_/1 ../solver/tw.x
-	L1M_NTHREADS=$(NUM_CORES) ./optimizer.py
+	L1M_NTHREADS=$(NCORES) ./optimizer.py
 
 _current_/1:
 	mkdir _current_
@@ -17,3 +17,5 @@ _current_/1:
 
 clean:
 	rm -fr logoptim.log _current_ __pycache__
+
+.PRECIOUS: logoptim.log

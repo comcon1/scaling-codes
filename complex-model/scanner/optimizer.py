@@ -4,6 +4,24 @@ from scipy.optimize import minimize
 from scipy.optimize import dual_annealing
 import launcher_1m
 import numpy as np
+import sys, signal
+
+nice_kill = False
+
+def exit_gracefully(signum, frame):
+    global nice_kill
+    print('''
+============================================
+PROCESS WILL BE TERMINATED AT THE NEXT STEP
+============================================
+''')
+    nice_kill = True
+
+signal.signal(signal.SIGINT, exit_gracefully)
+signal.signal(signal.SIGTERM, exit_gracefully)
+
+
+
 
 def MyCallback(xk, log, fval=None, ctx=None):
     print('STEP DONE!')
@@ -34,19 +52,23 @@ targetVals = np.array([
              [ None,  None,    None,   None,  1374.,  989.,    None,   None, None, None ]
                   ])
 
-flog = open('logoptim.log', 'a')
+flog = open('logoptim.log', 'w')
 
 def cbck(x,f,s):
+    global nice_kill
     print(x)
     print(f)
     print(s)
-    
+    if nice_kill:
+        return True
+    return False
+
 res = dual_annealing(lambda x,y,z: launcher_1m.calculate_error(x,y,z, log=flog), \
         x0=initVector, \
         args=( equiRads, targetVals, ), \
         bounds=initBounds,
         initial_temp=100, \
-        visit=1.5,
+        visit=1.5, \
         callback=cbck \
         )
 
