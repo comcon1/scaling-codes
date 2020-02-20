@@ -1,4 +1,4 @@
-# scaling-codes
+# Simple phenomenological models
 
 Extremly fast and accurate 1D C++ solver of Reaction-Diffusion equation is used here for parametric scan 
 of three phenomenological models of embryonic scaling: Expansion-Repression, Contraction-Induction (original) [1], and Contraction-Induction (improved) [2].
@@ -30,11 +30,36 @@ For scan codes install also *python3*:
 
 Enter model directory, e.g. ER model: `phen-models/er`.
 
-Modify **NCORES** variable in the *Makefile* according to your processor core numbers.
 If you have *boost* installed into non-standard place, correct **CPPFLAGS** and/or **LIBS** variables as well. 
 In other case, just run `make` to build and `make test` to verify if executable is OK.
 
-Next, go to `phen-models/scanner` and run scan with `make erscan`. 
+Before starting the scan, go to `phen-models/scanner` and modify **NCORES** variable in the *Makefile* according to your processor core numbers. Next run scan with `make erscan`. 
 If you want to modify parametric set, change *paramset-er.py*.
 
-## Good luck!
+# Complex model of mesoderm patterning
+
+Lorem ipsum dolor sit amet..
+
+## Install prerequisites
+
+Install the same packages as required for simple models (see above). C++ code of complex model does not require any additional libraries. At the same time, code of the scanner requires `scipy` and `numpy`.
+
+```
+apt install python3-pip
+pip3 install pip --update
+pip3 install numpy scipy
+```
+
+Note, that scanner uses **dual-annealling** stochastic optimizer that requires rather modern version of *scipy* (v. 1.2.0+).
+
+## Build codes
+
+Make C++ solver in the same way as described in phenomonological model section.
+
+Next, modify **NCORES** variable in the *Makefile* accordingly, and perform the scan in `scanner` directory with the command:
+
+`make scan`
+
+To terminate the process accurately, please terminate optimizer directly:
+
+`pkill optimizer`
