@@ -26,7 +26,7 @@ For scan codes install also *python3*:
 
 `apt install python3`
 
-## Build codes
+## Build codes and run the scanner
 
 Enter model directory, e.g. ER model: `phen-models/er`.
 
@@ -52,7 +52,7 @@ pip3 install numpy scipy
 
 Note, that scanner uses **dual-annealling** stochastic optimizer that requires rather modern version of *scipy* (v. 1.2.0+).
 
-## Build codes
+## Build codes and run the scanner
 
 Make C++ solver in the same way as described in phenomonological model section.
 
@@ -60,6 +60,11 @@ Next, modify **NCORES** variable in the *Makefile* accordingly, and perform the 
 
 `make scan`
 
-To terminate the process accurately, please terminate optimizer directly:
+We strongly recommend to perform the scan in the detached mode. For example, when using *screen*:
+
+`screen make scan`
+
+To terminate the process accurately, please terminate *optimizer.py* process directly:
 
 `pkill optimizer`
+

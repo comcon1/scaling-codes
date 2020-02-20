@@ -20,13 +20,6 @@ PROCESS WILL BE TERMINATED AT THE NEXT STEP
 signal.signal(signal.SIGINT, exit_gracefully)
 signal.signal(signal.SIGTERM, exit_gracefully)
 
-
-
-
-def MyCallback(xk, log, fval=None, ctx=None):
-    print('STEP DONE!')
-    print('STEP PARAMETERS: ' + ' '.join(map(str, xk)) )
-
 # =======================
 #    pna   pnx  pm3  psa 
 #    psb   pst  pnu  ph  
@@ -54,16 +47,23 @@ targetVals = np.array([
 
 flog = open('logoptim.log', 'w')
 
-def cbck(x,f,s):
+def cbck():
     global nice_kill
-    print(x)
-    print(f)
-    print(s)
-    if nice_kill:
-        return True
-    return False
+    print('''
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        I WILL %s
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<''' % ('STOP' if nice_kill else 'CONTINUE') )
+    return nice_kill
 
-res = dual_annealing(lambda x,y,z: launcher_1m.calculate_error(x,y,z, log=flog), \
+def _wrapper(x,y,z):
+    global flog
+    answer = launcher_1m.calculate_error(x,y,z, log=flog)
+    if cbck():
+        raise KeyboardInterrupt('INTERRUPT')
+    return answer
+
+try:
+    res = dual_annealing(_wrapper, \
         x0=initVector, \
         args=( equiRads, targetVals, ), \
         bounds=initBounds,
@@ -71,5 +71,9 @@ res = dual_annealing(lambda x,y,z: launcher_1m.calculate_error(x,y,z, log=flog),
         visit=1.5, \
         callback=cbck \
         )
+except KeyboardInterrupt:
+    print(">> Interrupted correctly! <<")
+except:
+    raise
 
 flog.close()
