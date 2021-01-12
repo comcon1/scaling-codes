@@ -22,7 +22,7 @@ Install required pacakges. For ubuntu/debian use the following packages:
 
 `apt install g++ libboost-dev liblapack3-dev`
 
-For scan codes install also *python3*:
+The last package is named `liblapack-dev` in some distributions. For scan codes install also *python3*:
 
 `apt install python3`
 
@@ -43,14 +43,13 @@ Lorem ipsum dolor sit amet..
 ## Install prerequisites
 
 Install the same packages as required for simple models (see above). C++ code of complex model does not require any additional libraries. At the same time, code of the scanner requires `scipy` and `numpy`.
+The scanner uses **dual-annealling** stochastic optimizer that requires *scipy* v. 1.2.0+. If your *scipy* version is lower than upgrade it, e.g., via pip:
 
 ```
 apt install python3-pip
-pip3 install pip --update
+pip3 install pip --upgrade
 pip3 install numpy scipy
 ```
-
-Note, that scanner uses **dual-annealling** stochastic optimizer that requires rather modern version of *scipy* (v. 1.2.0+).
 
 ## Build codes and run the scanner
 
