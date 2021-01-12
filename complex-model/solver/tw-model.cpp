@@ -53,8 +53,8 @@ vector<po::option> ignore_numbers(std::vector<std::string>& args) {
 
 struct MyParams {
   double bmp, Kd, sb, sa, na, nx, nm, mmp3, nu, h, smad_threshold, 
-         ca, cx, tb, tld, de_init, caf_a, caf_x, caf_threshold,
-        smad_tau, caf_tau, smad_mean ;
+         ca, cx, tb, tld, de_init, enaf_a, enaf_x, enaf_threshold,
+        smad_tau, enaf_tau, smad_mean ;
   std::vector<double> D;
   std::vector<dpair> bFlux;
 };
@@ -67,7 +67,7 @@ class MySolver: public CNSolver<MyParams> {
   protected:
 
     virtual void reaction(std::vector<ubs::vector<double> > &vars_, double t_) {
-      auto _c = vars_[0], _n = vars_[1], caf = vars_[2], de = vars_[3] ;
+      auto _c = vars_[0], _n = vars_[1], enaf = vars_[2], de = vars_[3] ;
       auto &_1 = TMPR_vec_un,
            &_bmpa = TMPR_vec_t2,
            &_smad = TMPR_vec_t3,
@@ -146,17 +146,17 @@ class MySolver: public CNSolver<MyParams> {
                                 - 
                   _n * ( (pp.nm*pp.mmp3 + 1)*pp.nx )  ;
 
-      // caf
-      vars_[2] = ( _1 - ubx::tanh(de*5) ) * (pp.caf_a/2)
+      // enaf
+      vars_[2] = ( _1 - ubx::tanh(de*5) ) * (pp.enaf_a/2)
                                 -
-                            caf * pp.caf_x;
+                            enaf * pp.enaf_x;
 
       // delta
       vars_[3] = 
         ( de * pp.h - ubs::element_prod(de, ubs::element_prod( de, de) ) 
           + 
-         (_1 * pp.caf_threshold - caf) *
-              std::exp( -std::pow(t_/pp.caf_tau, 2) )
+         (_1 * pp.enaf_threshold - enaf) *
+              std::exp( -std::pow(t_/pp.enaf_tau, 2) )
           +
          (_smad - _1 * pp.smad_threshold) *
               std::exp( -0.5 * std::pow( (t_-pp.smad_mean)/pp.smad_tau, 2) ) 
@@ -189,12 +189,12 @@ class MySolver: public CNSolver<MyParams> {
       pp_.cx = cmdParams[12];       // 1.0e-3
       pp_.de_init = cmdParams[13];  // 400 vs 200
       // ---- ---- ----
-      pp_.caf_a = cmdParams[14];      // 1e-3 
-      pp_.caf_x = cmdParams[15];      // 1e-3
-      pp_.caf_threshold = cmdParams[16];      // 0.6
+      pp_.enaf_a = cmdParams[14];      // 1e-3 
+      pp_.enaf_x = cmdParams[15];      // 1e-3
+      pp_.enaf_threshold = cmdParams[16];      // 0.6
       // timing params. Strictly set up
       pp_.smad_tau  = 1 * 3600; //
-      pp_.caf_tau   = 1 * 3600;  
+      pp_.enaf_tau   = 1 * 3600;  
       pp_.smad_mean = 2 * 3600;
 
       pp_.nm = 3;
@@ -222,8 +222,8 @@ class MySolver: public CNSolver<MyParams> {
       cout << format("De Init: %7.1f Diff. coeff Chd/N2: %5.2f / %5.2f") 
         % pp_.de_init % pp_.D[0] % pp_.D[1];
       cout << endl;
-      cout << format("CAF_a: %6.1e CAF_x: %6.1e CAF_thr: %5.2f") 
-        % pp_.caf_a % pp_.caf_x % pp_.caf_threshold;
+      cout << format("ENAF_a: %6.1e ENAF_x: %6.1e ENAF_thr: %5.2f") 
+        % pp_.enaf_a % pp_.enaf_x % pp_.enaf_threshold;
       cout << endl;
       cout << " ============================= " << endl;
       // TODO: output
@@ -238,7 +238,7 @@ class MySolver: public CNSolver<MyParams> {
           aux = ((double)reacLength*j/reacN)/pp.de_init;
           vars_[0](j) = (pp.ca/pp.cx)*exp(-aux*aux/2.);         // Chd
           vars_[1](j) = (pp.na/pp.nx)*exp(-aux*aux/2.);         // N2
-          vars_[2](j) = (pp.caf_a/pp.caf_x)*exp(-aux*aux/2.);   // Caf
+          vars_[2](j) = (pp.enaf_a/pp.enaf_x)*exp(-aux*aux/2.);   // ENAF
           vars_[3](j) = -1.0 + ( (aux > 2.0) ? 2.0 : aux );     // De
         }
         // initialize debug vector
