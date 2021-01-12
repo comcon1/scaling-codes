@@ -21,7 +21,7 @@ typedef std::complex<double> dcomplex;
 #include "boost/numeric/ublasx/operation/tanh.hpp"
 #include "boost/numeric/ublasx/operation/exp.hpp"
 #include "boost/numeric/ublasx/operation/sqr.hpp"
-#include "boost/numeric/ublasx/operation/element_pow.hpp"
+#include "boost/numeric/ublasx/operation/pow.hpp"
 #include "boost/numeric/ublasx/operation/sign.hpp"
 namespace ubx = boost::numeric::ublasx;
 
@@ -94,12 +94,12 @@ class MySolver: public CNSolver<MyParams> {
       cn  = ubs::element_prod(c,n);
       n3  = ubs::element_prod(n, ubx::sqr(n) );
 
-    _t0 =  ubx::element_pow( 2.6968322100701824e16*u1 + 5.6595440196711e15*c + 3.95902006695e14*c2  
+    _t0 =  ubx::pow( 2.6968322100701824e16*u1 + 5.6595440196711e15*c + 3.95902006695e14*c2  
                             + 9.23150925e12*c3 - 7.98154665879636e16*n - 2.4131419699725e15*cn 
                             + 2.21764138875e14*c2n + 8.050040609832e16*n2 - 2.304054763875e15*cn2 
                             - 2.792943963425e16*n3 + 
                             ubx::sqrt(
-                                4.*ubx::element_pow(
+                                4.*ubx::pow(
                                   - 5.6652092289e10*u1 - 7.9259661e9*c - 2.772225e8*c2 + 1.117783836e11*n 
                                   - 4.4397225e9*cn - 5.86147225e10*n2, 3)
                                 + ubx::sqr(
