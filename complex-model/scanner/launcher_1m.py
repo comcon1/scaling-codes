@@ -11,22 +11,25 @@ of = False
 def calculate_error(_params, _erads, _eres, log=None):
     '''
     _params -- vector of results
-      0: na in control sample (Noggin2 production)
-      1: nx in all samples (Noggin2 degradation in absence of MMP3)
-      2: mmp3 amount in control sample
-      3: sa in all samples (SMAD cascade intensity)
-      4: sb in all samples (BMP amount for SMAD switch)
-      5: smad_threshold determines bifurcation point for SMAD amount (can be
-        correlated with *sa*)
-      6: nu determines rate of delta reaction to other agents
-      7: h determines the strength of delta hysteresis
-      8: tb determines the strength of chordin degradation inhibition by mmp3.
+       0: na in control sample (Noggin2 production)
+       1: nx in all samples (Noggin2 degradation in absence of MMP3)
+       2: mmp3 amount in control sample
+       3: sa in all samples (SMAD cascade intensity)
+       4: sb in all samples (BMP amount for SMAD switch)
+       5: smad_threshold determines bifurcation point for SMAD amount (can be
+         correlated with *sa*)
+       6: nu determines rate of delta reaction to other agents
+       7: h determines the strength of delta hysteresis
+       8: tb determines the strength of chordin degradation inhibition by mmp3.
         Less tb - more inhibition.
-      9: ca rate of Chordin in all samples
-      10: cx degratation rate of Chordin in all samples (in absence of MMP3)
+       9: ca, production rate of Chordin in all samples
+      10: cx, degratation rate of Chordin in all samples (in absence of MMP3)
       11: s0 for definition of de_init parameter
-      12: cth determines value of SMAD activation, which defines the edge of
-        CACT expression area
+      12: (psa-cth) delta of threshold determines value of SMAD activation, which defines the edge of
+        the somitic mesoderm (CACT expr. area)
+      13: efa, ENAF production rate
+      14: efx, ENAF degradation rate
+      15: eft, ENAF threshold for cell fate switching
     _erads -- vector of equisurf. radii
     _eres -- vector of results
     @RETURN: float
@@ -34,10 +37,10 @@ def calculate_error(_params, _erads, _eres, log=None):
 
     T = 10
 
-    pna = _params[0];  pnx = _params[1];  pm3 = _params[2];  psa = _params[3]
-    psb = _params[4];  pst = _params[5];  pnu = _params[6];  ph  = _params[7]
-    ptb = _params[8];  pca = _params[9];  pcx = _params[10]; s0 = _params[11]
-    pct = _params[12]; cfa = _params[13]; cfx = _params[14]; cft = _params[15] 
+    pna = _params[0];      pnx = _params[1];  pm3 = _params[2];  psa = _params[3]
+    psb = _params[4];      pst = _params[5];  pnu = _params[6];  ph  = _params[7]
+    ptb = _params[8];      pca = _params[9];  pcx = _params[10]; s0 = _params[11]
+    pct = psa-_params[12]; efa = _params[13]; efx = _params[14]; eft = _params[15] 
 
     '''
              T     L      na      nx   mmp3      sa   sb  smthr  nu    h   tb    ca     cx   dinit
@@ -57,16 +60,16 @@ wh. -C-N 9   T   pi*r    pna/5.  pnx   pm3      psa  psb   pst   pnu   ph  ptb  
     '''
     _r = _erads
     param_array = np.array([ \
-        [   T, pi*_r[0] ,pna   , pnx , pm3    , psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[0]**2, cfa, cfx, cft ],\
-        [   T, pi*_r[1] ,pna   , pnx , pm3/10., psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[1]**2, cfa, cfx, cft ],\
-        [   T, pi*_r[2] ,pna/5., pnx , pm3    , psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[2]**2, cfa, cfx, cft ],\
-        [   T, pi*_r[3] ,pna/5., pnx , pm3/10., psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[3]**2, cfa, cfx, cft ],\
-        [   T, pi*_r[4] ,pna   , pnx , pm3    , psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[4]**2, cfa, cfx, cft ],\
-        [   T, pi*_r[5] ,pna   , pnx , pm3/5. , psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[5]**2, cfa, cfx, cft ],\
-        [   T, pi*_r[6] ,pna/5., pnx , pm3/5. , psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[6]**2, cfa, cfx, cft ],\
-        [   T, pi*_r[7] ,pna   , pnx , pm3    , psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[7]**2, cfa, cfx, cft ],\
-        [   T, pi*_r[8] ,pna   , pnx , pm3    , psa, psb,  pst,  pnu,  ph, ptb,  pca/5.,  pcx, 1.59e-5*s0*_r[8]**2, cfa, cfx, cft ],\
-        [   T, pi*_r[9] ,pna/5., pnx , pm3    , psa, psb,  pst,  pnu,  ph, ptb,  pca/5.,  pcx, 1.59e-5*s0*_r[9]**2, cfa, cfx, cft ],\
+        [   T, pi*_r[0] ,pna   , pnx , pm3    , psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[0]**2, efa, efx, eft ],\
+        [   T, pi*_r[1] ,pna   , pnx , pm3/10., psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[1]**2, efa, efx, eft ],\
+        [   T, pi*_r[2] ,pna/5., pnx , pm3    , psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[2]**2, efa, efx, eft ],\
+        [   T, pi*_r[3] ,pna/5., pnx , pm3/10., psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[3]**2, efa, efx, eft ],\
+        [   T, pi*_r[4] ,pna   , pnx , pm3    , psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[4]**2, efa, efx, eft ],\
+        [   T, pi*_r[5] ,pna   , pnx , pm3/5. , psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[5]**2, efa, efx, eft ],\
+        [   T, pi*_r[6] ,pna/5., pnx , pm3/5. , psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[6]**2, efa, efx, eft ],\
+        [   T, pi*_r[7] ,pna   , pnx , pm3    , psa, psb,  pst,  pnu,  ph, ptb,  pca   ,  pcx, 1.59e-5*s0*_r[7]**2, efa, efx, eft ],\
+        [   T, pi*_r[8] ,pna   , pnx , pm3    , psa, psb,  pst,  pnu,  ph, ptb,  pca/5.,  pcx, 1.59e-5*s0*_r[8]**2, efa, efx, eft ],\
+        [   T, pi*_r[9] ,pna/5., pnx , pm3    , psa, psb,  pst,  pnu,  ph, ptb,  pca/5.,  pcx, 1.59e-5*s0*_r[9]**2, efa, efx, eft ],\
             ])
     nexp = param_array.shape[0]
     assert(nexp == _eres.shape[1])
@@ -166,7 +169,15 @@ def extract_results_delta(Ls, dirname, log):
     res = np.zeros(nexp)
     try:
         for i in range(nexp):
-            a = np.loadtxt(os.path.join(dirname, 'exp%d.txt' % (i)))
+            try:
+                a = np.loadtxt(os.path.join(dirname, 'exp%d.txt' % (i)))
+            except ValueError as e:
+                print('Can\'t load the matrix')
+                print('THE SOLUTION DIVERGES!')
+                # Do not break calculation in this case;
+                # just put -666 for identification of the divergence
+                res[i] = -666
+                continue
             Nx = (a.shape[1]-1) / 5.
             assert(abs(Nx - int(Nx)) < 1e-8) 
             Nx = int(Nx)
@@ -191,7 +202,15 @@ def extract_results_smad(Ls, dirname, log, s_a, s_b, ctsh):
     res = np.zeros(nexp)
     try:
         for i in range(nexp):
-            a = np.loadtxt(os.path.join(dirname, 'exp%d.txt' % (i)))
+            try:
+                a = np.loadtxt(os.path.join(dirname, 'exp%d.txt' % (i)))
+            except ValueError as e:
+                print('Can\'t load the matrix')
+                print('THE SOLUTION DIVERGES!')
+                # Do not break calculation in this case;
+                # just put -666 for identification of the divergence
+                res[i] = -666
+                continue
             Nx = (a.shape[1]-1) / 5.
             assert(abs(Nx - int(Nx)) < 1e-8) 
             Nx = int(Nx)
@@ -244,7 +263,7 @@ if __name__ == '__main__':
     #    pna  pnx  pm3  psa 
     #    psb  pst  pnu  ph  
     #    ptb  pca  pcx  pde
-    #    pct  cfa  cfx  cft  
+    #    pct  efa  efx  eft  
     # =======================
     initVector = np.array([
         0.000990214267170159,9.318719739708396e-05,4.542275518749989,10.385969331018355,
