@@ -20,12 +20,12 @@ PROCESS WILL BE TERMINATED AT THE NEXT STEP
 signal.signal(signal.SIGINT, exit_gracefully)
 signal.signal(signal.SIGTERM, exit_gracefully)
 
-# =======================
-#    pna   pnx  pm3  psa 
-#    psb   pst  pnu  ph  
-#    ptb   pca  pcx  pde 
-#    smt   efa  efx  eft
-# =======================
+# ===========================
+#   pna       pnx  pm3  psa 
+#   psb       pst  pnu  ph  
+#   ptb       pca  pcx  pde 
+#   psa-smt   efa  efx  eft
+# ===========================
 
 initVector = [
  0.0009825491410708322, 7.66590953454e-05, 4.224027984344428, 10.3581808483661,
