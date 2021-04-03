@@ -25,6 +25,31 @@ typedef std::complex<double> dcomplex;
 #include "boost/numeric/ublasx/operation/sign.hpp"
 namespace ubx = boost::numeric::ublasx;
 
+namespace boost {  namespace program_options {
+
+vector<po::option> ignore_numbers(std::vector<std::string>& args) {
+        vector<po::option> result;
+        int pos = 0;
+        while(!args.empty()) {
+            const auto& arg = args[0];
+            double num;
+            if(boost::conversion::try_lexical_convert(arg, num)) {
+                result.push_back(po::option());
+                po::option& opt = result.back();
+
+                opt.position_key = pos++;
+                opt.value.push_back(arg);
+                opt.original_tokens.push_back(arg);
+
+                args.erase(args.begin());
+            } else {
+                break;
+            }
+        }
+
+        return result;
+    }
+} }
 
 struct MyParams {
   double bmp, Kd, sb, sa, na, nx, nm, mmp3, nu, h, smad_threshold, 
@@ -36,16 +61,8 @@ struct MyParams {
 
 class MySolver: public CNSolver<MyParams> {
     vector<double> cmdParams;
-    bool setDiffusionFlag;
-    double msD1, msD2;
-
   public:
-    MySolver(std::ofstream &of_, vector<double> cmd_): CNSolver<MyParams>(of_) { cmdParams = cmd_; setDiffusionFlag = false; }
-    
-    void setD(double _D1, double _D2) {
-      setDiffusionFlag = true;
-      msD1 = _D1; msD2 = _D2;
-    }
+    MySolver(std::ofstream &of_, vector<double> cmd_): CNSolver<MyParams>(of_) { cmdParams = cmd_; }
 
   protected:
 
@@ -149,7 +166,6 @@ class MySolver: public CNSolver<MyParams> {
 
     } // end CNSolver::reaction
 
-
     virtual void setParams(MyParams &pp_) {
       // Parameters for setting up
       timeStep = 8.0;  // not defined in paper
@@ -182,8 +198,7 @@ class MySolver: public CNSolver<MyParams> {
       pp_.smad_mean = 2 * 3600;
 
       pp_.nm = 3;
-      if (setDiffusionFlag) pp_.D = {msD1, msD2, 0, 0};
-      else pp_.D = { 15.0, 0.5, 0, 0};
+      pp_.D = { 15.0, 0.5, 0, 0};
       pp_.bFlux = { dpair( 0 , 0 ), dpair( 0 , 0 ), dpair( 0 , 0 ), dpair( 0 , 0 ) };
       
       pp_.tld = 1/(1 + pp_.mmp3*pp_.mmp3/pp_.tb/pp_.tb); // derivative parameter
@@ -209,9 +224,6 @@ class MySolver: public CNSolver<MyParams> {
       cout << endl;
       cout << format("ENAF_a: %6.1e ENAF_x: %6.1e ENAF_thr: %5.2f") 
         % pp_.enaf_a % pp_.enaf_x % pp_.enaf_threshold;
-      cout << endl;
-      cout << format("D [Chordin]: %6.2f D [Noggin]: %6.2f") 
-        % pp_.D[0] % pp_.D[1] ;
       cout << endl;
       cout << " ============================= " << endl;
       // TODO: output
@@ -247,16 +259,19 @@ int main(int ac, char **av) {
   desc.add_options()
       ("help,h", "produce help message")
       ("output-file,O", po::value<string>(), "set output file")
-      ("input-params", po::value< vector<double> >()->multitoken(), 
-          "input parameters: Tmax Length Na Nx [MMP3] Sa Sb [SMAD]thr nu h Tb Ca Cx Delta_init Fa Fx [ENAF]thr")
-      ("change-d", po::value< vector<double> >()->multitoken(), 
-          "Diffusion coefficent: Chordin [default: 15 u2/s], Noggin [default: 0.5 u2/s]" )
+      ("input-params", po::value< vector<double> >(), 
+          "input parameters: D, not defined")
   ;
+
+  po::positional_options_description pos;
+  pos.add("input-params", -1);
 
   po::variables_map vm;
   try {
     po::store(po::command_line_parser(ac, av)
+              .extra_style_parser(&po::ignore_numbers)
               .options(desc)
+              .positional(pos)
               .run(), vm);
     po::notify(vm);
   } catch(...) {
@@ -287,27 +302,16 @@ int main(int ac, char **av) {
   if (rParams.size() != 17) {
     cout << "Incorrect number of parameters. See help carefully." << endl;
     return 1;
+  } else {
+      for (auto i: rParams)
+          cout << i << " ";
+      cout << endl;
   }
-  cout << "Using reaction parametrs: ";
-  for (auto i: rParams)
-    cout << i << " ";
-  cout << endl;
 
   std::ofstream of( ofName, std::ios::out);
 
   of << "# write by main.x" << endl;
   MySolver s(of, rParams);
-
-  if (vm.count("change-d") ) {
-      vector<double> d12 = vm["change-d"].as<vector<double> >();
-      if (d12.size() != 2) {
-         cout << "You should specify only 2 diffusion coefficients!" << endl;
-	 return 1;
-      }
-      cout << "Specifing D1,2: " << d12[0] << " " << d12[1] << endl;
-      s.setD(d12[0], d12[1]);
-  }
-
   s.initialize();
   s.runSolver();
 
