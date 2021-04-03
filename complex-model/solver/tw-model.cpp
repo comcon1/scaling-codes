@@ -71,7 +71,9 @@ class MySolver: public CNSolver<MyParams> {
       auto &_1 = TMPR_vec_un,
            &_bmpa = TMPR_vec_t2,
            &_smad = TMPR_vec_t3,
-           &_tmp = TMPR_vec_t4;
+           &_tmp = TMPR_vec_t4,
+	   &_m3 = TMPR_vec_t5,
+      	   &_tld = TMPR_vec_t6;
            /* temporaries for bmpa calculations */
       auto &u1 = TMPR_cpx_un, 
            &c = TMPR_cpx_t1,
@@ -136,15 +138,22 @@ class MySolver: public CNSolver<MyParams> {
                                    + _1 / (pp.sb*pp.sb) )
                                ) * (pp.sa/pp.sb/pp.sb);
 
+//    uncomment to make MMP3 uniform
+//    _m3 = _1 * pp.mmp3;
+      _m3 = (_1  + ubx::sign(de) * (1 - 2* std::exp(-(t_/3600)*(t_/3600)/2.) ) ) * (pp.mmp3/2); 
+
+      _tld = ubs::element_div(_1, 
+			      _1 + ubx::sqr(_m3) / (pp.tb*pp.tb) );
+
       // chordin
       vars_[0] = ( _1 - ubx::tanh(de*5) ) * (pp.ca/2)
                                 -
-                            _c * pp.cx * pp.tld;
+                            pp.cx * ubs::element_prod( _c, _tld );
 
       // noggin2
       vars_[1] = ( _1 - ubx::tanh(de*5) ) * (pp.na/2) 
                                 - 
-                  _n * ( (pp.nm*pp.mmp3 + 1)*pp.nx )  ;
+                  ubs::element_prod(_n, (pp.nm * _m3 + _1) ) * pp.nx  ;
 
       // enaf
       vars_[2] = ( _1 - ubx::tanh(de*5) ) * (pp.enaf_a/2)
