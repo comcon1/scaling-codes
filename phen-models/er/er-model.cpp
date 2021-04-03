@@ -90,7 +90,7 @@ int main(int ac, char **av) {
   po::options_description desc("Allowed options");
   
   desc.add_options()
-      ("help", "produce help message")
+      ("help,h", "produce help message")
       ("output-file,O", po::value<string>(), "set output file")
       ("input-params", po::value< vector<double> >(), 
           "input parameters: Dm, De, am1, am2, ae, mFlux, be, t0, h, L, T")

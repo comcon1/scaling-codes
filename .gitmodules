@@ -1,6 +1,6 @@
 [submodule "boost-ublasx"]
 	path = boost-ublasx
-	url = https://github.com/comcon1/boost-ublasx
+	url = https://github.com/sguazt/boost-ublasx
 [submodule "numeric_bindings"]
 	path = numeric_bindings
 	url = https://github.com/uBLAS/numeric_bindings

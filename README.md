@@ -20,7 +20,7 @@ Then init all the submodules:
 
 Install required pacakges. For ubuntu/debian use the following packages:
 
-`apt install g++ libboost-dev liblapack3-dev`
+`apt install g++ libboost-program-options-dev liblapack3-dev`
 
 The last package is named `liblapack-dev` in some distributions. For scan codes install also *python3*:
 
