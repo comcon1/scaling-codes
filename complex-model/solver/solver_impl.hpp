@@ -115,6 +115,8 @@ void CNSolver<TParams>::initialize() {
   TMPR_vec_t2 = dvector_type(reacN);
   TMPR_vec_t3 = dvector_type(reacN);
   TMPR_vec_t4 = dvector_type(reacN);
+  TMPR_vec_t5 = dvector_type(reacN);
+  TMPR_vec_t6 = dvector_type(reacN);
 
   TMPR_cpx_un  = cvector_type(reacN, dcomplex(1.0,0.0));
   TMPR_cpx_t1  = cvector_type(reacN);

@@ -77,7 +77,8 @@ template <typename TParams> class CNSolver {
 
     dvector_type spec_var;
     dvector_type TMPR_vec_un, 
-      TMPR_vec_t1, TMPR_vec_t2, TMPR_vec_t3, TMPR_vec_t4;
+      TMPR_vec_t1, TMPR_vec_t2, TMPR_vec_t3, TMPR_vec_t4,
+      TMPR_vec_t5, TMPR_vec_t6;
     cvector_type TMPR_cpx_un, 
       TMPR_cpx_t1, TMPR_cpx_t2, TMPR_cpx_t3, TMPR_cpx_t4,
       TMPR_cpx_t5, TMPR_cpx_t6, TMPR_cpx_t7, TMPR_cpx_t8,
