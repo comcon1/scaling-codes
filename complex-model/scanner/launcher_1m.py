@@ -81,6 +81,8 @@ wh. -C-N 9   T   pi*r    pna/5.  pnx   pm3      psa  psb   pst   pnu   ph  ptb  
         param_strings[i] += [ "-O" ]
         param_strings[i] += [ "_current_/exp%d.txt" % (i) ]
         param_strings[i] += [ "--input-params" ]
+        param_strings[i] += [ "--change-d" ]
+        param_strings[i] += [ "7.5", "0.5" ]
         param_strings[i] += map(str, param_array[i,:])
     # check _current_ folder
     #print(param_strings)
